@@ -2,11 +2,15 @@ package ir.markazandroid.police;
 
 import android.app.Application;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
+import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.UUID;
 
@@ -57,6 +61,8 @@ public class PoliceApplication extends Application implements SignalReceiver {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        initSystemStartUp();
         getSignalManager().addReceiver(this);
         Log.e("version",BuildConfig.VERSION_NAME);
 
@@ -65,7 +71,7 @@ public class PoliceApplication extends Application implements SignalReceiver {
 
         getSocketManager().addMessageListener(this::onSocketMessage);
 
-        //getPortReader().start();
+        getPortReader().start();
         if (getPreferencesManager().getArduinoOnOffTime()!=null){
             String command = getPreferencesManager().getArduinoOnOffTime();
             setArdunoTime(command);
@@ -82,24 +88,26 @@ public class PoliceApplication extends Application implements SignalReceiver {
 
         getLocationMgr().start();
 
-
-        checkTaxiBoardVersion();
-
         //getConsole().w("pm install -r -d /mnt/sdcard/police/pmcd/app4320.apk");
     }
 
-    private void checkTaxiBoardVersion() {
-        String packageName = "com.taxiboard.board";
-        try {
-            PackageInfo pi = getApplicationContext().getPackageManager().getPackageInfo(packageName, 0);
-            int versionNumber = pi.versionCode;
-            if (versionNumber<131)
-                getOwnPackageManager().installTaxiBoard();
-
-        } catch (android.content.pm.PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+    private void initSystemStartUp() {
+        File libSerialSo = new File("/system/lib/libserial_port.so");
+        if (!libSerialSo.exists()) {
+            File temp = new File(Environment.getExternalStorageDirectory() + "/police/libserial_port.so");
+            try {
+                FileUtils.copyInputStreamToFile(getAssets().open("nativeLibs/libserial_port.so"), temp);
+                getConsole().write("mount -o rw,remount /system;" +
+                        "cp " + temp.getPath() + " " + libSerialSo.getPath() + ";" +
+                        "rm " + temp.getPath() + ";" +
+                        "chmod -R 644 " + libSerialSo.getPath() + ";" +
+                        "chown root:root " + libSerialSo.getPath() + ";");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
+
 
     private boolean setArdunoTime(String command){
         //17:0:9:0

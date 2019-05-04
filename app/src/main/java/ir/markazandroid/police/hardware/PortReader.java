@@ -1,10 +1,6 @@
 package ir.markazandroid.police.hardware;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.hardware.usb.UsbDevice;
-import android.hardware.usb.UsbManager;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
@@ -14,14 +10,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import ir.markazandroid.police.PoliceApplication;
 import ir.markazandroid.police.hardware.serial.SerialPort;
-import ir.markazandroid.police.hardware.serial.SerialPortFinder;
 import ir.markazandroid.police.signal.Signal;
 import ir.markazandroid.police.signal.SignalManager;
 import ir.markazandroid.police.util.Roozh;
@@ -70,42 +63,14 @@ public class PortReader extends Thread {
                         .replaceAll("\n","");
                 lastData=cmd;
 
-                String[] dataArray = cmd.split(";");
+                /*String[] dataArray = cmd.split(";");
                 Map<String,String> dataMap = new HashMap<>();
                 for(String data:dataArray){
                     String[] d = data.split(":");
                     dataMap.put(d[0],d[1]);
                 }
-                int d = Integer.parseInt(dataMap.get("d"));
+                int d = Integer.parseInt(dataMap.get("d"));*/
 
-                if (d<100 && d>0){
-                    if (!isBlocked) {
-                        blockAcc++;
-                        if (blockAcc >=3) {
-                            blockAcc =0;
-                            isBlocked = true;
-                            sendBlockViewSignal();
-                        }
-                    }
-                    else {
-                        unBlockAcc=0;
-                    }
-                }
-                else{
-                    if (isBlocked) {
-                        unBlockAcc++;
-                        if (unBlockAcc>=0) {
-                            unBlockAcc=0;
-                            isBlocked = false;
-                            sendUnBlockViewSignal();
-                        }
-                    }
-                    else {
-                        blockAcc=0;
-                    }
-                }
-                //handler.post(()-> Toast.makeText(context,dataMap.get("d"),Toast.LENGTH_SHORT).show());
-                Log.e("distance",dataMap.get("d")+"  ");
             }catch (Exception ignored){
 
             }
@@ -135,110 +100,23 @@ public class PortReader extends Thread {
 
     public void init(){
 
-        /*final UsbManager manager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
-        List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(manager);
-        if (availableDrivers.isEmpty()) {
-            return;
-        }
-
-
-// Open a connection to the first available driver.
-        final UsbSerialDriver driver = availableDrivers.get(0);
-        final UsbDeviceConnection connection = manager.openDevice(driver.getDevice());
-        if (connection == null) {
-
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    PendingIntent mPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0);
-                    IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
-                    context.registerReceiver(mUsbReceiver, filter);
-                    manager.requestPermission(driver.getDevice(), mPermissionIntent);
-                }
-            });
-            //showToast("NO DRIVER FOUND!");
-            // You probably need to call UsbManager.requestPermission(driver.getDevice(), ..)
-            return;
-        }*/
-
-
-// Read some data! Most have just one port (port 0).
-        //port = driver.getPorts().get(0);
-
-        boolean found=false;
-        SerialPortFinder portFinder = new SerialPortFinder();
-        String[] devices = portFinder.getAllDevicesPath();
-        String portName="";
+        String portName = "/dev/ttyS3";
 
         try {
-            serialPort = new SerialPort(new File("/dev/ttyS4"),9600,0);
+            serialPort = new SerialPort(new File(portName), 9600, 0);
             inputStream=serialPort.getInputStream();
-            found=true;
-            portName="/dev/ttyS4";
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
+            if (serialPort != null)
+                serialPort.close();
         }
 
-        if(!found){
-            try {
-                serialPort = new SerialPort(new File("/dev/ttyS2"),9600,0);
-                inputStream=serialPort.getInputStream();
-                found=true;
-                portName="/dev/ttyS2";
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (!found) {
-            handler.post(()-> Toast.makeText(context,"Primary Port Not Found",Toast.LENGTH_SHORT).show());
-            for (String device:devices) {
-                //new File("/dev/ttyS2")
-                try {
-                    serialPort = new SerialPort(new File(device),9600,0);
-                    inputStream=serialPort.getInputStream();
-                    if (inputStream.available()<1){
-                        Thread.sleep(200);
-                        if (inputStream.available()>0) {
-                            found=true;
-                            portName=device;
-                            handler.post(()-> Toast.makeText(context,"Port Found "+ device,Toast.LENGTH_SHORT).show());
-                            break;
-                        }
-                        serialPort.close();
-                    }
-                    else{
-                        portName=device;
-                        found=true;
-                        handler.post(()-> Toast.makeText(context,"Port Found "+ device,Toast.LENGTH_SHORT).show());
-                        break;
-                    }
-                    serialPort.close();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    try {
-                        if(serialPort!=null) {
-                            serialPort.close();
-                        }
-                    }catch (Exception ignored){}
-
-                }
-            }
-        }
-        else {
-            String finalPortName = portName;
-            handler.post(()-> Toast.makeText(context,"Port Found "+ finalPortName,Toast.LENGTH_SHORT).show());
-        }
     }
 
 
     @Override
     public void run() {
 
-
-        //port.open(connection);
-        //port.setParameters(9600, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
         byte buffer[] = new byte[1024];
 
         //isCancelled
@@ -249,36 +127,16 @@ public class PortReader extends Thread {
                 inputParser.addInput(read);
             } catch (Exception e) {
                 e.printStackTrace();
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
                 init();
-                //handler.post(()-> Toast.makeText(context,e.getMessage(),Toast.LENGTH_SHORT).show());
             }
 
-
-            //SystemClock.sleep(2000);
-                /*if (Integer.parseInt(in.charAt(2)+"")==1)
-                    if (!isBlocked) {
-                        isBlocked=true;
-                        sendBlockViewSignal();
-                    }
-                else if (isBlocked) {
-                        isBlocked=false;
-                        sendUnBlockViewSignal();
-                    }*/
 
         }
-
-
-        /*serialPort.openPort();
-        serialPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
-        try {
-            while (true)
-            {
-                byte[] readBuffer = new byte[1024];
-                int numRead = serialPort.readBytes(readBuffer, readBuffer.length);
-                Log.e("Read",numRead+"");
-            }
-        } catch (Exception e) { e.printStackTrace(); }
-        serialPort.closePort();*/
     }
 
     public String readChar(InputStream inputStream,byte[] buffer) throws IOException {
@@ -311,43 +169,16 @@ public class PortReader extends Thread {
     }
 
     private void sendBlockViewSignal(){
-        //TODO NM
         //handler.post(()-> Toast.makeText(context,"Block",Toast.LENGTH_SHORT).show());
         Signal signal = new Signal("screen block",Signal.SIGNAL_SCREEN_BLOCK);
         //getSignalManager().sendMainSignal(signal);
     }
 
     private void sendUnBlockViewSignal(){
-        //TODO NM
         //handler.post(()-> Toast.makeText(context,"Unblock",Toast.LENGTH_SHORT).show());
         Signal signal = new Signal("screen unblock",Signal.SIGNAL_SCREEN_UNBLOCK);
         //getSignalManager().sendMainSignal(signal);
     }
-
-    private static final String ACTION_USB_PERMISSION =
-            "com.android.example.USB_PERMISSION";
-    private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
-
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (ACTION_USB_PERMISSION.equals(action)) {
-                synchronized (this) {
-                    UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-
-                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-                        if(device != null){
-                            /*PortReader portReader = new PortReader(context);
-                            ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
-                            threadPoolExecutor.execute(portReader);*/
-                        }
-                    }
-                    else {
-                        Log.d("tag", "permission denied for device " + device);
-                    }
-                }
-            }
-        }
-    };
 
     public void close(){
         try {

@@ -269,8 +269,9 @@ public class Console implements Closeable {
     }
 
 
+
     @Override
-    public void close() throws IOException {
+    public void close() {
         process.destroy();
     }
     private static class ReaderThread extends Thread{

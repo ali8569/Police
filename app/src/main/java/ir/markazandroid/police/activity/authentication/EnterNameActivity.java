@@ -3,14 +3,9 @@ package ir.markazandroid.police.activity.authentication;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.TextInputLayout;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
 
 import ir.markazandroid.police.PoliceApplication;
 import ir.markazandroid.police.R;
@@ -40,8 +35,6 @@ public class EnterNameActivity extends BaseActivity {
                     getString("ir.markazandroid.uinitializr.EnterNameActivity.name",null);
 
             ((PoliceApplication)getApplication()).getConsole().w("pm uninstall ir.markazandroid.uinitializr");
-            //TODO Install Taxiboard
-            ((PoliceApplication)getApplication()).getOwnPackageManager().installTaxiBoard();
         } catch (Exception e) {
             e.printStackTrace();
             name="TBInit8569";
