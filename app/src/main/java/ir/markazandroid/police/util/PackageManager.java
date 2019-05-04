@@ -86,12 +86,11 @@ public class PackageManager {
                             "cp " + apkFile.getPath() + " /system/app/" + fileName + ";" +
                             "rm " + apkFile.getPath() + ";" +
                             "chmod -R 644 /system/app/" + fileName + ";" +
-                            "chown root:root /system/app/" + fileName + ";");
+                            "chown root:root /system/app/" + fileName + ";" +
+                            "reboot\n");
             os.flush();
-            return process.waitFor();
+            //return process.waitFor();
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
             e.printStackTrace();
         }
         return -1;

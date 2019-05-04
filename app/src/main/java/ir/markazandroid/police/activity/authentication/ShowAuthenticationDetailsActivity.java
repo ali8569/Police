@@ -1,15 +1,8 @@
 package ir.markazandroid.police.activity.authentication;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
-import ir.markazandroid.police.PoliceApplication;
 import ir.markazandroid.police.R;
 import ir.markazandroid.police.activity.BaseActivity;
 import ir.markazandroid.police.object.Phone;
@@ -31,13 +24,6 @@ public class ShowAuthenticationDetailsActivity extends BaseActivity {
 
         textView.setText("نام دستگاه: "+phone.getName()+"\r\n"+"رمز: "+phone.getPassword());
 
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                runOnUiThread(() -> ((PoliceApplication)getApplication()).getConsole().write("reboot"));
-            }
-        },10_000);
 
     }
 }
