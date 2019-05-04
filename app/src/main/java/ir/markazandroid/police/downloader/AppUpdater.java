@@ -57,10 +57,9 @@ public class AppUpdater {
         if (!file.exists())
             path="/storage/emulated/legacy/police/app.apk";
 */
-        if ("TB".equalsIgnoreCase(version.getModel()))
-            console.updateTBPolice(appFile.getPath());
-        else
+        if ("IOT20A".equalsIgnoreCase(version.getModel()))
             console.updatePolice(appFile.getPath());
+
     }
 
     public static class GenericFileProvider extends FileProvider {

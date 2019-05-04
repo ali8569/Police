@@ -168,69 +168,6 @@ public class Console implements Closeable {
             readerThread.start();
             Log.e("Up","got here2");
             DataOutputStream os = new DataOutputStream(process.getOutputStream());
-            os.writeBytes(//"stop;"+
-                    "mount -o rw,remount /system;"+
-                    "mv "+apkPath+" /system/priv-app/Police/Police.apk;"+
-                    "chmod 755 /system/priv-app/Police;"+
-                    "chmod -R 644 /system/priv-app/Police;"+
-                    "chmod 755 /system/priv-app/Police;" +
-                            "chown root:root /system/priv-app/Police;"+
-                            "chown root:root /system/priv-app/Police/Police.apk;"+
-            "reboot\n");
-            os.flush();
-            Log.e("Up","got here3");
-            /*process.waitFor();
-
-            //process.waitFor();
-            //process=Runtime.getRuntime().exec("su -c mount -o rw,remount /system");
-            //process.waitFor();
-            //Log.e("Up","got here1");
-            //process=Runtime.getRuntime().exec("su -c stop");
-            //new ReaderThread(process).start();
-            //process.waitFor();
-            Log.e("Up","got here2");
-            process=Runtime.getRuntime().exec("mv "+apkPath+" /system/priv-app/Police/Police.apk");
-            new ReaderThread(process).start();
-            process.waitFor();
-            Log.e("Up","got here3");
-            process=Runtime.getRuntime().exec("chmod 755 /system/priv-app/Police");
-            new ReaderThread(process).start();
-            process.waitFor();
-            Log.e("Up","got here4");
-            process=Runtime.getRuntime().exec("chmod -R 644 /system/priv-app/Police");
-            new ReaderThread(process).start();
-            process.waitFor();
-            Log.e("Up","got here5");
-            process=Runtime.getRuntime().exec("chmod 755 /system/priv-app/Police");
-            new ReaderThread(process).start();
-            process.waitFor();
-            Log.e("Up","got here6");
-            process=Runtime.getRuntime().exec("chown root:root /system/priv-app/Police/Police.apk");
-            new ReaderThread(process).start();
-            process.waitFor();
-            Log.e("Up","got here7");
-            process=Runtime.getRuntime().exec("reboot");*/
-
-            //"stop;mount -o rw,remount /system;mv /storage/emulated/0/police/app.apk /system/priv-app/Police/Police.apk;chmod 755 /system/priv-app/Police;chmod -R 644 /system/priv-app/Police;chmod 755 /system/priv-app/Police;reboot"
-            //os.writeBytes("exit\n");
-            //os.flush();
-            //process.waitFor();
-            //writer.write(s);
-            //writer.flush();
-            //process.waitFor();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public synchronized void updateTBPolice(String apkPath){
-        try {
-
-            process=Runtime.getRuntime().exec("su");
-            ReaderThread readerThread = new ReaderThread(process);
-            readerThread.start();
-            Log.e("Up","got here2");
-            DataOutputStream os = new DataOutputStream(process.getOutputStream());
             Log.e("Path",apkPath);
             os.writeBytes(//"stop;"+
                     "mount -o rw,remount /system;"+

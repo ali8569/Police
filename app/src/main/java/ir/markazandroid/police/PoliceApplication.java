@@ -93,18 +93,16 @@ public class PoliceApplication extends Application implements SignalReceiver {
 
     private void initSystemStartUp() {
         File libSerialSo = new File("/system/lib/libserial_port.so");
-        if (!libSerialSo.exists()) {
-            File temp = new File(Environment.getExternalStorageDirectory() + "/police/libserial_port.so");
-            try {
-                FileUtils.copyInputStreamToFile(getAssets().open("nativeLibs/libserial_port.so"), temp);
-                getConsole().write("mount -o rw,remount /system;" +
-                        "cp " + temp.getPath() + " " + libSerialSo.getPath() + ";" +
-                        "rm " + temp.getPath() + ";" +
-                        "chmod -R 644 " + libSerialSo.getPath() + ";" +
-                        "chown root:root " + libSerialSo.getPath() + ";");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        File temp = new File(Environment.getExternalStorageDirectory() + "/police/libserial_port.so");
+        try {
+            FileUtils.copyInputStreamToFile(getAssets().open("nativeLibs/libserial_port.so"), temp);
+            getConsole().write("mount -o rw,remount /system;" +
+                    "cp " + temp.getPath() + " " + libSerialSo.getPath() + ";" +
+                    "rm " + temp.getPath() + ";" +
+                    "chmod -R 644 " + libSerialSo.getPath() + ";" +
+                    "chown root:root " + libSerialSo.getPath() + ";");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
