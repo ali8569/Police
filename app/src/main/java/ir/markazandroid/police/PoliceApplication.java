@@ -12,6 +12,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.UUID;
 
 import ir.markazandroid.police.activity.authentication.LoginActivity;
@@ -113,7 +114,7 @@ public class PoliceApplication extends Application implements SignalReceiver {
         Calendar calendar = Calendar.getInstance();
         int nowHour = calendar.get(Calendar.HOUR_OF_DAY);
         int nowMinute= calendar.get(Calendar.MINUTE);
-        int now = Integer.parseInt(String.format("%02d%02d",nowHour,nowMinute));
+        int now = Integer.parseInt(String.format(Locale.US, "%02d%02d", nowHour, nowMinute));
         int off = Integer.parseInt(times[0]+times[1]);
         int on = Integer.parseInt(times[2]+times[3]);
 
@@ -130,7 +131,7 @@ public class PoliceApplication extends Application implements SignalReceiver {
             }
             else nowMinute+=5;
 
-            if (Integer.parseInt(String.format("%02d%02d",nowHour,nowMinute))>=on && Integer.parseInt(String.format("%02d%02d",nowHour,nowMinute))-on<6){
+            if (Integer.parseInt(String.format(Locale.US, "%02d%02d", nowHour, nowMinute)) >= on && Integer.parseInt(String.format(Locale.US, "%02d%02d", nowHour, nowMinute)) - on < 6) {
                 return getPortReader().write(generateArduinoTime(command));
             }
             command=nowHour+":"+nowMinute+":"+times[2]+":"+times[3];
@@ -233,12 +234,22 @@ public class PoliceApplication extends Application implements SignalReceiver {
 
                 },1);
                 outputMessage.setMessage("Done");
-            }
-            else{
+            } else if (command.startsWith("dinstalla ")) {
+                String ts = command.substring("dinstalla ".length(), command.length());
+                getOwnPackageManager().downloadAndInstall(ts, (processCode, status) -> {
+                    if (processCode == PackageManager.PROGRESS_SUCCESS) {
+                        outputMessage.setSuccess(true);
+                        getSocketManager().send(getParser().get(outputMessage).toString());
+                    } else
+                        broadcastMessage(status, message.getMessageId());
+
+                }, 2);
+                outputMessage.setMessage("Done");
+            } else{
                 switch (command){
                     case "disconnect": getSocketManager().disconnect(); break;
-                   // case "disable input": getPreferencesManager().addStartupCommand("system disable input"); disableInput(); break;
-                   // case "enable input": getPreferencesManager().removeStartupCommand("system disable input"); enableInput(); break;
+                    // case "disable input": getPreferencesManager().addStartupCommand("system disable input"); disableInput(); break;
+                    // case "enable input": getPreferencesManager().removeStartupCommand("system disable input"); enableInput(); break;
                     default:
                         outputMessage.setSuccess(false);
                         outputMessage.setMessage("Unknown System Command \""+command+"\"");

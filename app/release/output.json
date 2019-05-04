@@ -9,11 +9,11 @@
       "versionCode": 1201,
       "versionName": "1.2.1 IOT20A",
       "enabled": true,
-      "outputFile": "app-release.apk",
+      "outputFile": "Police_V1.2.1_IOT20A.apk",
       "fullName": "release",
       "baseName": "release"
     },
-    "path": "app-release.apk",
+    "path": "Police_V1.2.1_IOT20A.apk",
     "properties": {}
   }
 ]
