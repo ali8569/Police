@@ -2,22 +2,12 @@ package ir.markazandroid.police.util;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.util.Xml;
 import android.view.View;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Locale;
 
 
@@ -38,11 +28,10 @@ public class Utils {
         return Math.round(px / (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
     }
 
-    @SuppressLint("DefaultLocale")
     public static String getNowForArduino(){
         Calendar calendar = Calendar.getInstance();
         //T:HH:MM:SS:DD:MM:YY:HH:MM:HH:MM#
-        return String.format("T:%d:%d:%d:%d:%d:%d:",
+        return String.format(Locale.US, "T:%d:%d:%d:%d:%d:%d:",
                 calendar.get(Calendar.HOUR_OF_DAY),
                 calendar.get(Calendar.MINUTE),
                 calendar.get(Calendar.SECOND),

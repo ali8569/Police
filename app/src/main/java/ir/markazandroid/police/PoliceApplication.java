@@ -7,6 +7,8 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
+
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -15,6 +17,7 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.UUID;
 
+import io.fabric.sdk.android.Fabric;
 import ir.markazandroid.police.activity.authentication.LoginActivity;
 import ir.markazandroid.police.downloader.AppUpdater;
 import ir.markazandroid.police.downloader.Downloader;
@@ -62,6 +65,7 @@ public class PoliceApplication extends Application implements SignalReceiver {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
 
         initSystemStartUp();
         getSignalManager().addReceiver(this);
@@ -150,9 +154,9 @@ public class PoliceApplication extends Application implements SignalReceiver {
             Message outputMessage = new Message();
             outputMessage.setMessageId(message.getMessageId());
             outputMessage.setType(Message.RESPONSE);
-            String tcmd = message.getMessage().substring("terminal ".length(), message.getMessage().length());
+            String tcmd = message.getMessage().substring("terminal ".length());
             if (tcmd.startsWith("-w ")){
-                tcmd=tcmd.substring("-w ".length(), tcmd.length());
+                tcmd = tcmd.substring("-w ".length());
                 getConsole().w(tcmd
                         , (resultCode, output) -> {
                             outputMessage.setTime(System.currentTimeMillis());
@@ -170,9 +174,9 @@ public class PoliceApplication extends Application implements SignalReceiver {
         }
         else if (message.getMessage().startsWith("arduino ")){
             //T:HH:MM:SS:DD:MM:YY:HH:MM:HH:MM#
-            String command = message.getMessage().substring("arduino ".length(), message.getMessage().length());
+            String command = message.getMessage().substring("arduino ".length());
             if(command.startsWith("setTime ")){
-                String onOffTime = command.substring("setTime ".length(), command.length());
+                String onOffTime = command.substring("setTime ".length());
                 //command = generateArduinoTime(onOffTime);
                 getPreferencesManager().setArduinoOnOffTime(onOffTime);
                 Message outputMessage = new Message();
@@ -186,7 +190,7 @@ public class PoliceApplication extends Application implements SignalReceiver {
 
         }
         else if (message.getMessage().startsWith("system ")){
-            String command = message.getMessage().substring("system ".length(), message.getMessage().length());
+            String command = message.getMessage().substring("system ".length());
             Message outputMessage = new Message();
             outputMessage.setMessageId(message.getMessageId());
             outputMessage.setType(Message.RESPONSE);
@@ -195,7 +199,7 @@ public class PoliceApplication extends Application implements SignalReceiver {
             //outputMessage.setSuccess(true);
 
             if (command.startsWith("set ")){
-                String ts = command.substring("set ".length(), command.length());
+                String ts = command.substring("set ".length());
                 getPreferencesManager().addStartupCommand(ts);
                 outputMessage.setMessage("Done");
                 outputMessage.setSuccess(true);
@@ -203,14 +207,14 @@ public class PoliceApplication extends Application implements SignalReceiver {
 
             }
             else if (command.startsWith("unset ")){
-                String ts = command.substring("unset ".length(), command.length());
+                String ts = command.substring("unset ".length());
                 getPreferencesManager().removeStartupCommand(ts);
                 outputMessage.setMessage("Done");
                 outputMessage.setSuccess(true);
                 getSocketManager().send(getParser().get(outputMessage).toString());
             }
             else if (command.startsWith("dinstall ")){
-                String ts = command.substring("dinstall ".length(), command.length());
+                String ts = command.substring("dinstall ".length());
                 getOwnPackageManager().downloadAndInstall(ts, (processCode, status) -> {
                     if (processCode==PackageManager.PROGRESS_SUCCESS) {
                         outputMessage.setSuccess(true);
@@ -223,7 +227,7 @@ public class PoliceApplication extends Application implements SignalReceiver {
                 outputMessage.setMessage("Done");
             }
             else if (command.startsWith("dinstallt ")){
-                String ts = command.substring("dinstallt ".length(), command.length());
+                String ts = command.substring("dinstallt ".length());
                 getOwnPackageManager().downloadAndInstall(ts, (processCode, status) -> {
                     if (processCode==PackageManager.PROGRESS_SUCCESS) {
                         outputMessage.setSuccess(true);
@@ -235,7 +239,7 @@ public class PoliceApplication extends Application implements SignalReceiver {
                 },1);
                 outputMessage.setMessage("Done");
             } else if (command.startsWith("dinstalla ")) {
-                String ts = command.substring("dinstalla ".length(), command.length());
+                String ts = command.substring("dinstalla ".length());
                 getOwnPackageManager().downloadAndInstall(ts, (processCode, status) -> {
                     if (processCode == PackageManager.PROGRESS_SUCCESS) {
                         outputMessage.setSuccess(true);
