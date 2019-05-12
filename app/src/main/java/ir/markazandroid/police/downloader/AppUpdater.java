@@ -57,7 +57,7 @@ public class AppUpdater {
         if (!file.exists())
             path="/storage/emulated/legacy/police/app.apk";
 */
-        if ("IOT20A".equalsIgnoreCase(version.getModel()))
+        if ("DS".equalsIgnoreCase(version.getModel()))
             console.updatePolice(appFile.getPath());
 
     }

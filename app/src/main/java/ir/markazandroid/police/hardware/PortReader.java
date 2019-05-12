@@ -100,7 +100,7 @@ public class PortReader extends Thread {
 
     public void init(){
 
-        String portName = "/dev/ttyS3";
+        String portName = "/dev/ttyS2";
 
         try {
             serialPort = new SerialPort(new File(portName), 9600, 0);
@@ -117,7 +117,7 @@ public class PortReader extends Thread {
     @Override
     public void run() {
 
-        byte buffer[] = new byte[1024];
+        byte[] buffer = new byte[1024];
 
         //isCancelled
         while (!isCancelled) {

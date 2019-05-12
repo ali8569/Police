@@ -106,6 +106,31 @@ public class Console implements Closeable {
         }
     }
 
+    public void writeWithoutExit(String cmd, ConsoleOut consoleOut) {
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    process = Runtime.getRuntime().exec("su");
+                    ReaderThread readerThread = new ReaderThread(process);
+                    readerThread.setConsoleOut(consoleOut);
+                    readerThread.start();
+                    DataOutputStream os = new DataOutputStream(process.getOutputStream());
+                    os.writeBytes(cmd);
+                    os.flush();
+                    process.waitFor();
+                    //writer.write(s);
+                    //writer.flush();
+                    //process.waitFor();
+                } catch (Exception e) {
+                    consoleOut.onCommandFinished(-69, "Exception: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        }.run();
+
+    }
+
     public void w(String s,ConsoleOut consoleOut){
         try {
             process=Runtime.getRuntime().exec(s);
@@ -166,19 +191,17 @@ public class Console implements Closeable {
             process=Runtime.getRuntime().exec("su");
             ReaderThread readerThread = new ReaderThread(process);
             readerThread.start();
-            Log.e("Up","got here2");
             DataOutputStream os = new DataOutputStream(process.getOutputStream());
-            Log.e("Path",apkPath);
             os.writeBytes(//"stop;"+
                     "mount -o rw,remount /system;"+
-                            "cp "+apkPath+" /system/app/Police.apk;"+
-                            "rm "+apkPath+";"+
-                            "chmod -R 644 /system/app/Police.apk;"+
-                            "chown root:root /system/app/Police.apk;"+
+                            "mv " + apkPath + " /system/priv-app/Police/Police.apk;" +
+                            "chmod 755 /system/priv-app/Police;" +
+                            "chmod -R 644 /system/priv-app/Police;" +
+                            "chmod 755 /system/priv-app/Police;" +
+                            "chown root:root /system/priv-app/Police;" +
+                            "chown root:root /system/priv-app/Police/Police.apk;" +
                             "reboot\n");
             os.flush();
-            Log.e("Up","got here3");
-
         } catch (IOException e) {
             e.printStackTrace();
         }

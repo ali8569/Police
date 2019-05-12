@@ -15,7 +15,7 @@ public class Stats implements Serializable {
     private int versionCode;
 
     @Form
-    private String model = "IOT20A";
+    private String model = "DS";
 
     @Form
     private String arduinoStats="NA";

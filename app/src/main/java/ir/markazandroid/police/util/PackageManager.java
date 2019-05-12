@@ -61,7 +61,7 @@ public class PackageManager {
     }
 
     public void install(File apk){
-        console.w("pm install -r -d "+apk.getPath());
+        console.write("pm install -r -d " + apk.getPath());
         //FileUtils.deleteQuietly(apk);
     }
 
@@ -83,10 +83,10 @@ public class PackageManager {
             DataOutputStream os = new DataOutputStream(process.getOutputStream());
             os.writeBytes(//"stop;"+
                     "mount -o rw,remount /system;" +
-                            "cp " + apkFile.getPath() + " /system/app/" + fileName + ";" +
+                            "cp " + apkFile.getPath() + " /system/priv-app/" + fileName + ";" +
                             "rm " + apkFile.getPath() + ";" +
-                            "chmod -R 644 /system/app/" + fileName + ";" +
-                            "chown root:root /system/app/" + fileName + ";" +
+                            "chmod -R 644 /system/priv-app/" + fileName + ";" +
+                            "chown root:root /system/priv-app/" + fileName + ";" +
                             "reboot\n");
             os.flush();
             //return process.waitFor();

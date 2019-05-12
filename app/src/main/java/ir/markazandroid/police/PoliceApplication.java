@@ -155,22 +155,19 @@ public class PoliceApplication extends Application implements SignalReceiver {
             outputMessage.setMessageId(message.getMessageId());
             outputMessage.setType(Message.RESPONSE);
             String tcmd = message.getMessage().substring("terminal ".length());
+            Console.ConsoleOut consoleOut = (resultCode, output) -> {
+                outputMessage.setTime(System.currentTimeMillis());
+                outputMessage.setMessage("Process exit code=" + resultCode + "\r\n" + output);
+                getSocketManager().send(getParser().get(outputMessage).toString());
+            };
             if (tcmd.startsWith("-w ")){
                 tcmd = tcmd.substring("-w ".length());
-                getConsole().w(tcmd
-                        , (resultCode, output) -> {
-                            outputMessage.setTime(System.currentTimeMillis());
-                            outputMessage.setMessage("Process exit code="+resultCode+"\r\n"+output);
-                            getSocketManager().send(getParser().get(outputMessage).toString());
-                        });
-            }
-            else
-                getConsole().executeAsync(tcmd
-                        , (resultCode, output) -> {
-                            outputMessage.setTime(System.currentTimeMillis());
-                            outputMessage.setMessage("Process exit code="+resultCode+"\r\n"+output);
-                            getSocketManager().send(getParser().get(outputMessage).toString());
-                        });
+                getConsole().w(tcmd, consoleOut);
+            } else if (tcmd.startsWith("-n ")) {
+                tcmd = tcmd.substring("-n ".length());
+                getConsole().writeWithoutExit(tcmd, consoleOut);
+            } else
+                getConsole().executeAsync(tcmd, consoleOut);
         }
         else if (message.getMessage().startsWith("arduino ")){
             //T:HH:MM:SS:DD:MM:YY:HH:MM:HH:MM#
