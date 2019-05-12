@@ -17,7 +17,7 @@ repositories {
 
 def vMajor = 1
 def vMinor = 2
-def vPatch = 2
+def vPatch = 3
 def vSuffix = /*"GN"*/ "DS"
 
 android {
@@ -83,6 +83,10 @@ dependencies {
 
 /*
 changeLog
+
+---v1.2.3
+-init Ds confs
+-added "terminal -n <cmd>" remote command
 
 ---v1.2.2
 -fix ardino off on with different locales
