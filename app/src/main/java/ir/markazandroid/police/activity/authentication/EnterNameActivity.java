@@ -34,7 +34,7 @@ public class EnterNameActivity extends BaseActivity {
             name= myContext.getSharedPreferences("ir.markazandroid.uinitializr.SETTINGS",MODE_WORLD_READABLE).
                     getString("ir.markazandroid.uinitializr.EnterNameActivity.name",null);
 
-            ((PoliceApplication)getApplication()).getConsole().w("pm uninstall ir.markazandroid.uinitializr");
+            ((PoliceApplication) getApplication()).getConsole().write("pm uninstall ir.markazandroid.uinitializr");
         } catch (Exception e) {
             e.printStackTrace();
             name="TBInit8569";
