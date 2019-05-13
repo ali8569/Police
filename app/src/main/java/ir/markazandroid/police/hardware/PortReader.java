@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -63,14 +65,39 @@ public class PortReader extends Thread {
                         .replaceAll("\n","");
                 lastData=cmd;
 
-                /*String[] dataArray = cmd.split(";");
+                String[] dataArray = cmd.split(";");
                 Map<String,String> dataMap = new HashMap<>();
                 for(String data:dataArray){
                     String[] d = data.split(":");
                     dataMap.put(d[0],d[1]);
                 }
-                int d = Integer.parseInt(dataMap.get("d"));*/
+                int d = Integer.parseInt(dataMap.get("d"));
 
+                if (d < 100 && d > 0) {
+                    if (!isBlocked) {
+                        blockAcc++;
+                        if (blockAcc >= 3) {
+                            blockAcc = 0;
+                            isBlocked = true;
+                            sendBlockViewSignal();
+                        }
+                    } else {
+                        unBlockAcc = 0;
+                    }
+                } else {
+                    if (isBlocked) {
+                        unBlockAcc++;
+                        if (unBlockAcc >= 0) {
+                            unBlockAcc = 0;
+                            isBlocked = false;
+                            sendUnBlockViewSignal();
+                        }
+                    } else {
+                        blockAcc = 0;
+                    }
+                }
+                //handler.post(()-> Toast.makeText(context,dataMap.get("d"),Toast.LENGTH_SHORT).show());
+                Log.e("distance", dataMap.get("d") + "  ");
             }catch (Exception ignored){
 
             }
@@ -171,13 +198,13 @@ public class PortReader extends Thread {
     private void sendBlockViewSignal(){
         //handler.post(()-> Toast.makeText(context,"Block",Toast.LENGTH_SHORT).show());
         Signal signal = new Signal("screen block",Signal.SIGNAL_SCREEN_BLOCK);
-        //getSignalManager().sendMainSignal(signal);
+        getSignalManager().sendMainSignal(signal);
     }
 
     private void sendUnBlockViewSignal(){
         //handler.post(()-> Toast.makeText(context,"Unblock",Toast.LENGTH_SHORT).show());
         Signal signal = new Signal("screen unblock",Signal.SIGNAL_SCREEN_UNBLOCK);
-        //getSignalManager().sendMainSignal(signal);
+        getSignalManager().sendMainSignal(signal);
     }
 
     public void close(){

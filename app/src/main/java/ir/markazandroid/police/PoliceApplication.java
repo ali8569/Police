@@ -21,6 +21,7 @@ import io.fabric.sdk.android.Fabric;
 import ir.markazandroid.police.activity.authentication.LoginActivity;
 import ir.markazandroid.police.downloader.AppUpdater;
 import ir.markazandroid.police.downloader.Downloader;
+import ir.markazandroid.police.event.BaseEvent;
 import ir.markazandroid.police.hardware.PortReader;
 import ir.markazandroid.police.hardware.SensorMeter;
 import ir.markazandroid.police.network.JSONParser.Parser;
@@ -398,6 +399,10 @@ public class PoliceApplication extends Application implements SignalReceiver {
             isInternetConnected=false;
         }else if (signal.getType()==Signal.DOWNLOADER_NETWORK){
             isInternetConnected=true;
+        } else if (signal.getType() == Signal.SIGNAL_SCREEN_BLOCK) {
+            sendBroadcast(BaseEvent.getMirrorBlockIntent());
+        } else if (signal.getType() == Signal.SIGNAL_SCREEN_UNBLOCK) {
+            sendBroadcast(BaseEvent.getMirrorUnBlockIntent());
         }
         return false;
     }
