@@ -184,8 +184,7 @@ public class Console implements Closeable {
         }
     }
 
-
-    public synchronized void updatePolice(String apkPath){
+    public synchronized void installInSystem(String apkPath, String folderName, String fileName) {
         try {
 
             process=Runtime.getRuntime().exec("su");
@@ -194,12 +193,12 @@ public class Console implements Closeable {
             DataOutputStream os = new DataOutputStream(process.getOutputStream());
             os.writeBytes(//"stop;"+
                     "mount -o rw,remount /system;"+
-                            "mv " + apkPath + " /system/priv-app/Police/Police.apk;" +
-                            "chmod 755 /system/priv-app/Police;" +
-                            "chmod -R 644 /system/priv-app/Police;" +
-                            "chmod 755 /system/priv-app/Police;" +
-                            "chown root:root /system/priv-app/Police;" +
-                            "chown root:root /system/priv-app/Police/Police.apk;" +
+                            "mv " + apkPath + " /system/priv-app/" + folderName + "/" + fileName + ";" +
+                            "chmod 755 /system/priv-app/" + folderName + ";" +
+                            "chmod -R 644 /system/priv-app/" + folderName + ";" +
+                            "chmod 755 /system/priv-app/" + folderName + ";" +
+                            "chown root:root /system/priv-app/" + folderName + ";" +
+                            "chown root:root /system/priv-app/" + folderName + "/" + fileName + ";" +
                             "reboot\n");
             os.flush();
         } catch (IOException e) {

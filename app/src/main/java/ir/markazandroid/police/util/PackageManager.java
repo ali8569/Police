@@ -5,7 +5,6 @@ import android.os.Environment;
 
 import org.apache.commons.io.FileUtils;
 
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 
@@ -51,7 +50,7 @@ public class PackageManager {
                 if (method==1)
                     installTaxiBoard(apk);
                 else if (method == 2)
-                    installInSystem(apk, "Advertiser.apk");
+                    console.installInSystem(apk.getPath(), "Advertiser", "Advertiser.apk");
                 else
                     install(apk);
 
@@ -73,28 +72,6 @@ public class PackageManager {
         console.wWait("pm disable com.softwinner.launcher");
         //console.write("reboot");
         //FileUtils.deleteQuietly(apk);
-    }
-
-    private int installInSystem(File apkFile, String fileName) {
-
-        Process process = null;
-        try {
-            process = Runtime.getRuntime().exec("su");
-            DataOutputStream os = new DataOutputStream(process.getOutputStream());
-            os.writeBytes(//"stop;"+
-                    "mount -o rw,remount /system;" +
-                            "cp " + apkFile.getPath() + " /system/priv-app/" + fileName + ";" +
-                            "rm " + apkFile.getPath() + ";" +
-                            "chmod -R 644 /system/priv-app/" + fileName + ";" +
-                            "chown root:root /system/priv-app/" + fileName + ";" +
-                            "reboot\n");
-            os.flush();
-            //return process.waitFor();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return -1;
-
     }
 
     public void installTaxiBoard(){

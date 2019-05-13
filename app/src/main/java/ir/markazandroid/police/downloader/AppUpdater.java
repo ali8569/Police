@@ -58,7 +58,7 @@ public class AppUpdater {
             path="/storage/emulated/legacy/police/app.apk";
 */
         if ("DS".equalsIgnoreCase(version.getModel()))
-            console.updatePolice(appFile.getPath());
+            console.installInSystem(appFile.getPath(), "Police", "Police.apk");
 
     }
 
