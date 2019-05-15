@@ -84,6 +84,9 @@ dependencies {
 /*
 changeLog
 
+DS_MIRROR
+--support for mirror
+
 ---v1.2.4
 -fixed install in systems (for ds)
 
