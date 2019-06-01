@@ -6,14 +6,14 @@
     "apkInfo": {
       "type": "MAIN",
       "splits": [],
-      "versionCode": 1204,
-      "versionName": "1.2.4 DS_MIRROR",
+      "versionCode": 1205,
+      "versionName": "1.2.5 DS_MIRROR",
       "enabled": true,
-      "outputFile": "Police_V1.2.4_DS_MIRROR.apk",
+      "outputFile": "Police_V1.2.5_DS_MIRROR.apk",
       "fullName": "release",
       "baseName": "release"
     },
-    "path": "Police_V1.2.4_DS_MIRROR.apk",
+    "path": "Police_V1.2.5_DS_MIRROR.apk",
     "properties": {}
   }
 ]

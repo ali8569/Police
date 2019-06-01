@@ -17,7 +17,7 @@ repositories {
 
 def vMajor = 1
 def vMinor = 2
-def vPatch = 4
+def vPatch = 5
 def vSuffix = /*"GN"*/ "DS_MIRROR"
 
 android {
@@ -83,6 +83,9 @@ dependencies {
 
 /*
 changeLog
+
+---v1.2.5
+-changed serial input parser delimiter from '\n' to '$' for a bug of read
 
 DS_MIRROR
 --support for mirror

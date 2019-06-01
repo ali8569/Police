@@ -51,9 +51,9 @@ public class PortReader extends Thread {
 
 
         handler=new Handler(context.getMainLooper());
-        inputParser=new InputParser('\n', cmd -> {
+        inputParser = new InputParser('$', cmd -> {
             try {
-                Log.e("command",cmd);
+                //Log.e("command",cmd);
             /*if(cmd.equals("OFF")){
                 isBlocked=true;
                 sendBlockViewSignal();
@@ -97,7 +97,7 @@ public class PortReader extends Thread {
                     }
                 }
                 //handler.post(()-> Toast.makeText(context,dataMap.get("d"),Toast.LENGTH_SHORT).show());
-                Log.e("distance", dataMap.get("d") + "  ");
+                //Log.e("distance", dataMap.get("d") + "  ");
             }catch (Exception ignored){
 
             }
@@ -140,11 +140,11 @@ public class PortReader extends Thread {
 
     }
 
+    byte[] buffer = new byte[1024];
 
     @Override
     public void run() {
 
-        byte[] buffer = new byte[1024];
 
         //isCancelled
         while (!isCancelled) {
