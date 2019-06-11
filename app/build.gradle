@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 def vMajor = 1
 def vMinor = 2
-def vPatch = 1
+def vPatch = 2
 def vSuffix = /*"GN"*/ "TB"
 
 android {
@@ -47,3 +47,12 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
+/*
+changeLog
+
+---v1.2.2
+-updated taxiboard from 131 to 137
+
+
+
+ */
