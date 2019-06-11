@@ -19,6 +19,7 @@ import java.util.UUID;
 
 import io.fabric.sdk.android.Fabric;
 import ir.markazandroid.police.activity.authentication.LoginActivity;
+import ir.markazandroid.police.bluetooth.BluetoothServer;
 import ir.markazandroid.police.downloader.AppUpdater;
 import ir.markazandroid.police.downloader.Downloader;
 import ir.markazandroid.police.hardware.PortReader;
@@ -61,6 +62,7 @@ public class PoliceApplication extends Application implements SignalReceiver {
     private Downloader downloader;
     private AppUpdater appUpdater;
     private PackageManager packageManager;
+    private BluetoothServer bluetoothServer;
 
     @Override
     public void onCreate() {
@@ -73,14 +75,19 @@ public class PoliceApplication extends Application implements SignalReceiver {
 
         Intent intent = new Intent(this,PoliceService.class);
         startService(intent);
+        //Log.e("oh","oh2");
+
 
         getSocketManager().addMessageListener(this::onSocketMessage);
+        //Log.e("oh","oh3");
 
         getPortReader().start();
+        //Log.e("oh","oh4");
         if (getPreferencesManager().getArduinoOnOffTime()!=null){
             String command = getPreferencesManager().getArduinoOnOffTime();
             setArdunoTime(command);
         }
+        //Log.e("oh","oh5");
 
         for (String cmd:getPreferencesManager().getStartupCommands()){
             Message message = new Message();
@@ -90,8 +97,12 @@ public class PoliceApplication extends Application implements SignalReceiver {
             message.setTime(System.currentTimeMillis());
             onSocketMessage(message);
         }
+        //Log.e("oh","oh1");
+
 
         getLocationMgr().start();
+        getBluetoothServer().start();
+        //Log.e("oh","oh");
 
         //getConsole().w("pm install -r -d /mnt/sdcard/police/pmcd/app4320.apk");
     }
@@ -425,5 +436,13 @@ public class PoliceApplication extends Application implements SignalReceiver {
     public PackageManager getOwnPackageManager() {
         if (packageManager==null) packageManager=new PackageManager(getDownloader(),this,getConsole());
         return packageManager;
+    }
+
+    public BluetoothServer getBluetoothServer() {
+        if (bluetoothServer == null) {
+            bluetoothServer = new BluetoothServer(this);
+            //bluetoothServer.start();
+        }
+        return bluetoothServer;
     }
 }

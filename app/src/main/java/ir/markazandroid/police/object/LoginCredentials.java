@@ -18,6 +18,9 @@ public class LoginCredentials implements Serializable {
     @Form
     private String deviceId;
 
+    @Form
+    private String bluetoothMac;
+
     @JSON
     public String getPassword() {
         return password;
@@ -43,5 +46,13 @@ public class LoginCredentials implements Serializable {
 
     public void setDeviceId(String deviceId) {
         this.deviceId = deviceId;
+    }
+
+    public String getBluetoothMac() {
+        return bluetoothMac;
+    }
+
+    public void setBluetoothMac(String bluetoothMac) {
+        this.bluetoothMac = bluetoothMac;
     }
 }

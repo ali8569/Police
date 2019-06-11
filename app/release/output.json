@@ -6,14 +6,14 @@
     "apkInfo": {
       "type": "MAIN",
       "splits": [],
-      "versionCode": 1201,
-      "versionName": "1.2.1 IOT20A",
+      "versionCode": 1205,
+      "versionName": "1.2.5 DS",
       "enabled": true,
-      "outputFile": "Police_V1.2.1_IOT20A.apk",
+      "outputFile": "Police_V1.2.5_DS.apk",
       "fullName": "release",
       "baseName": "release"
     },
-    "path": "Police_V1.2.1_IOT20A.apk",
+    "path": "Police_V1.2.5_DS.apk",
     "properties": {}
   }
 ]
