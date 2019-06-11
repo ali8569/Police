@@ -1,6 +1,7 @@
 package ir.markazandroid.police;
 
 import android.app.Application;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.os.Handler;
@@ -191,13 +192,18 @@ public class PoliceApplication extends Application implements SignalReceiver {
             outputMessage.setMessage("non");
             //outputMessage.setSuccess(true);
 
-            if (command.startsWith("set ")){
+            if (command.startsWith("get ")) {
+                String ts = command.substring("get ".length());
+                String getResult = getValue(ts);
+                outputMessage.setMessage(getResult);
+                outputMessage.setSuccess(true);
+                getSocketManager().send(getParser().get(outputMessage).toString());
+            } else if (command.startsWith("set ")) {
                 String ts = command.substring("set ".length());
                 getPreferencesManager().addStartupCommand(ts);
                 outputMessage.setMessage("Done");
                 outputMessage.setSuccess(true);
                 getSocketManager().send(getParser().get(outputMessage).toString());
-
             }
             else if (command.startsWith("unset ")){
                 String ts = command.substring("unset ".length());
@@ -280,6 +286,15 @@ public class PoliceApplication extends Application implements SignalReceiver {
 
     private String generateArduinoTime(String onOffTime){
         return Utils.getNowForArduino() + onOffTime+"#";
+    }
+
+    private String getValue(String getCommand) {
+        switch (getCommand) {
+            case "bmac":
+                return BluetoothAdapter.getDefaultAdapter().getAddress();
+            default:
+                return "Unknown getCommand";
+        }
     }
 
 
