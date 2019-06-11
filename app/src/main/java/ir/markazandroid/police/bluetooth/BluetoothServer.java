@@ -98,7 +98,7 @@ public class BluetoothServer extends Thread {
 
     private void handleRequest(Request request) {
         Log.e("bluetooth Request", request.getBody());
-        console.executeAsync(request.getBody(), (resultCode, output) -> {
+        console.executeAs(request.getBody(), (resultCode, output) -> {
             Response response = new Response();
             response.setStatus(resultCode);
             response.setBody(output);
