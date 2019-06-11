@@ -11,6 +11,7 @@ import java.util.Calendar;
 import java.util.UUID;
 
 import ir.markazandroid.police.activity.authentication.LoginActivity;
+import ir.markazandroid.police.bluetooth.BluetoothServer;
 import ir.markazandroid.police.downloader.AppUpdater;
 import ir.markazandroid.police.downloader.Downloader;
 import ir.markazandroid.police.hardware.PortReader;
@@ -53,6 +54,7 @@ public class PoliceApplication extends Application implements SignalReceiver {
     private Downloader downloader;
     private AppUpdater appUpdater;
     private PackageManager packageManager;
+    private BluetoothServer bluetoothServer;
 
     @Override
     public void onCreate() {
@@ -81,6 +83,8 @@ public class PoliceApplication extends Application implements SignalReceiver {
         }
 
         getLocationMgr().start();
+        getBluetoothServer().start();
+        //Log.e("oh","oh");
 
 
         checkTaxiBoardVersion();
@@ -107,7 +111,7 @@ public class PoliceApplication extends Application implements SignalReceiver {
         Calendar calendar = Calendar.getInstance();
         int nowHour = calendar.get(Calendar.HOUR_OF_DAY);
         int nowMinute= calendar.get(Calendar.MINUTE);
-        int now = Integer.parseInt(String.format("%02d%02d",nowHour,nowMinute));
+        int now = Integer.parseInt(String.format(Locale.US, "%02d%02d", nowHour, nowMinute));
         int off = Integer.parseInt(times[0]+times[1]);
         int on = Integer.parseInt(times[2]+times[3]);
 
@@ -124,7 +128,7 @@ public class PoliceApplication extends Application implements SignalReceiver {
             }
             else nowMinute+=5;
 
-            if (Integer.parseInt(String.format("%02d%02d",nowHour,nowMinute))>=on && Integer.parseInt(String.format("%02d%02d",nowHour,nowMinute))-on<6){
+            if (Integer.parseInt(String.format(Locale.US, "%02d%02d", nowHour, nowMinute)) >= on && Integer.parseInt(String.format(Locale.US, "%02d%02d", nowHour, nowMinute)) - on < 6) {
                 return getPortReader().write(generateArduinoTime(command));
             }
             command=nowHour+":"+nowMinute+":"+times[2]+":"+times[3];
@@ -407,5 +411,13 @@ public class PoliceApplication extends Application implements SignalReceiver {
     public PackageManager getOwnPackageManager() {
         if (packageManager==null) packageManager=new PackageManager(getDownloader(),this,getConsole());
         return packageManager;
+    }
+
+    public BluetoothServer getBluetoothServer() {
+        if (bluetoothServer == null) {
+            bluetoothServer = new BluetoothServer(this);
+            //bluetoothServer.start();
+        }
+        return bluetoothServer;
     }
 }
