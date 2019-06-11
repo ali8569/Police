@@ -39,6 +39,17 @@ public class Console implements Closeable {
         writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
     }
 
+    //General
+    public void executeAs(String cmd, ConsoleOut consoleOut) {
+        executeAsync(cmd, consoleOut);
+    }
+
+    public void execute(String cmd) {
+        write(cmd);
+    }
+
+
+
     public void executeAsync(String cmd,ConsoleOut consoleOut){
         new Thread(){
             @Override
