@@ -86,6 +86,8 @@ changeLog
 
 ---v1.3.0
 -added bluetooth server
+-added get command
+-added general console method
 
 ---v1.2.4
 -fixed install in systems (for ds)
