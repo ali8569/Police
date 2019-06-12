@@ -198,6 +198,7 @@ public class PoliceApplication extends Application implements SignalReceiver {
                 outputMessage.setMessage(getResult);
                 outputMessage.setSuccess(true);
                 getSocketManager().send(getParser().get(outputMessage).toString());
+
             } else if (command.startsWith("set ")) {
                 String ts = command.substring("set ".length());
                 getPreferencesManager().addStartupCommand(ts);
