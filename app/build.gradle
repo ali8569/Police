@@ -17,7 +17,7 @@ repositories {
 
 def vMajor = 1
 def vMinor = 3
-def vPatch = 0
+def vPatch = 1
 def vSuffix = /*"GN"*/ "DS"
 
 android {

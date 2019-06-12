@@ -47,7 +47,7 @@ public class BluetoothServer extends Thread {
 
     private BluetoothSocket listenForNewClient() throws IOException {
         closeSockets();
-        serverSocket = bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord("ir.markazandroid.unitechcontroller", UUID.fromString(B_UUID));
+        serverSocket = bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord("ir.markazandroid.police", UUID.fromString(B_UUID));
         try {
             return serverSocket.accept();
         } finally {
