@@ -9,6 +9,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.UUID;
 
 import ir.markazandroid.police.activity.authentication.LoginActivity;
@@ -84,7 +85,7 @@ public class PoliceApplication extends Application implements SignalReceiver {
         }
 
         getLocationMgr().start();
-        getBluetoothServer().start();
+        //getBluetoothServer().start();
         //Log.e("oh","oh");
 
 
@@ -98,7 +99,7 @@ public class PoliceApplication extends Application implements SignalReceiver {
         try {
             PackageInfo pi = getApplicationContext().getPackageManager().getPackageInfo(packageName, 0);
             int versionNumber = pi.versionCode;
-            if (versionNumber < 137)
+            if (versionNumber < 139)
                 getOwnPackageManager().installTaxiBoard();
 
         } catch (android.content.pm.PackageManager.NameNotFoundException e) {

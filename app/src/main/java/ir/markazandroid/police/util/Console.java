@@ -41,11 +41,11 @@ public class Console implements Closeable {
 
     //General
     public void executeAs(String cmd, ConsoleOut consoleOut) {
-        executeAsync(cmd, consoleOut);
+        w(cmd, consoleOut);
     }
 
     public void execute(String cmd) {
-        write(cmd);
+        w(cmd);
     }
 
 
