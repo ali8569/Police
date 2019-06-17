@@ -1,6 +1,5 @@
 package ir.markazandroid.police.activity.authentication;
 
-import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -61,7 +60,7 @@ public class LoginActivity extends BaseActivity {
         LoginCredentials user = new LoginCredentials();
         user.setUsername(username.getText().toString());
         user.setPassword(password.getText().toString());
-        user.setBluetoothMac(BluetoothAdapter.getDefaultAdapter().getAddress());
+        //user.setBluetoothMac(BluetoothAdapter.getDefaultAdapter().getAddress());
         String id =((TelephonyManager)getSystemService(TELEPHONY_SERVICE)).getDeviceId();
         user.setDeviceId(id);
         //user.setToken(FirebaseInstanceId.getInstance().getToken());

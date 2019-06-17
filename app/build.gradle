@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 def vMajor = 1
 def vMinor = 3
-def vPatch = 0
+def vPatch = 1
 def vSuffix = /*"GN"*/ "TB"
 
 android {
@@ -61,6 +61,9 @@ dependencies {
 }
 /*
 changeLog
+
+---v1.3.1
+-disabled bluetooth
 
 ---v1.3.0
 -added bluetooth server
