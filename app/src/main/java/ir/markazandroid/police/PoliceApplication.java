@@ -99,7 +99,7 @@ public class PoliceApplication extends Application implements SignalReceiver {
         try {
             PackageInfo pi = getApplicationContext().getPackageManager().getPackageInfo(packageName, 0);
             int versionNumber = pi.versionCode;
-            if (versionNumber < 139)
+            if (versionNumber < 141)
                 getOwnPackageManager().installTaxiBoard();
 
         } catch (android.content.pm.PackageManager.NameNotFoundException e) {
