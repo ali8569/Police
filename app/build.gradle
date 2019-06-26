@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 def vMajor = 1
 def vMinor = 3
-def vPatch = 2
+def vPatch = 3
 def vSuffix = /*"GN"*/ "TB"
 
 android {
