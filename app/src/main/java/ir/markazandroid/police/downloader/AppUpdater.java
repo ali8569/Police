@@ -1,29 +1,13 @@
 package ir.markazandroid.police.downloader;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Environment;
-import android.os.Handler;
 import android.support.v4.content.FileProvider;
-import android.widget.Toast;
-
-import org.apache.commons.io.FileUtils;
-import org.json.JSONObject;
 
 import java.io.File;
-import java.io.InputStream;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import ir.markazandroid.police.PoliceApplication;
 import ir.markazandroid.police.BuildConfig;
-import ir.markazandroid.police.network.JSONParser.Parser;
-import ir.markazandroid.police.network.NetStatics;
 import ir.markazandroid.police.object.Version;
 import ir.markazandroid.police.util.Console;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 /**
  * Coded by Ali on 5/24/2018.
@@ -75,24 +59,6 @@ public class AppUpdater {
 */
         if ("TB".equalsIgnoreCase(version.getModel()))
             console.updateTBPolice(appFile.getPath());
-        else
-            console.updatePolice(appFile.getPath());
-    }
-
-    private void installUpdate() {
-        String path = "/storage/emulated/0/police/app.apk";
-        File file = new File("/storage/emulated/0/police/app.apk");
-        if (!file.exists())
-            path="/storage/emulated/legacy/police/app.apk";
-
-        Console console = new Console();
-        //console.start();
-        console.update("pm install -d -r "+path+";reboot");
-        //if (isTouchDisabled())
-          //  console.update("pm install -d -r "+path+";reboot");
-        //else
-          //  console.update("pm install -d -r "+path+";su -e monkey -p ir.markazandroid.police -c android.intent.category.LAUNCHER 1");
-        //console.write("");
 
     }
 

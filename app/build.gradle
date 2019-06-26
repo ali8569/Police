@@ -62,6 +62,9 @@ dependencies {
 /*
 changeLog
 
+---v1.3.3   98/04/05
+-sends model with getStatus
+
 ---v1.3.2   98/04/05
 -update tb from 139 to 141
 

@@ -2,7 +2,6 @@ package ir.markazandroid.police.object;
 
 import java.io.Serializable;
 
-import ir.markazandroid.police.BuildConfig;
 import ir.markazandroid.police.network.formdata.Form;
 
 /**
@@ -14,6 +13,10 @@ public class Stats implements Serializable {
     private String versionName;
     @Form
     private int versionCode;
+
+    @Form
+    private String model = "TB";
+
     @Form
     private String arduinoStats="NA";
     @Form
@@ -22,6 +25,7 @@ public class Stats implements Serializable {
     private double lon;
     @Form
     private long timestamp;
+
 
     @Form
     private long lastTime;
@@ -90,5 +94,13 @@ public class Stats implements Serializable {
 
     public void setLastTime(long lastTime) {
         this.lastTime = lastTime;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
     }
 }
