@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 def vMajor = 1
 def vMinor = 3
-def vPatch = 3
+def vPatch = 4
 def vSuffix = /*"GN"*/ "TB"
 
 android {
@@ -61,6 +61,9 @@ dependencies {
 }
 /*
 changeLog
+
+---v1.3.4   98/04/10
+-update tb from 141 to 142
 
 ---v1.3.3   98/04/05
 -sends model with getStatus
