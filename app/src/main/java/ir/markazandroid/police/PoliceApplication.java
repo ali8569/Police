@@ -23,6 +23,7 @@ import ir.markazandroid.police.activity.authentication.LoginActivity;
 import ir.markazandroid.police.bluetooth.BluetoothServer;
 import ir.markazandroid.police.downloader.AppUpdater;
 import ir.markazandroid.police.downloader.Downloader;
+import ir.markazandroid.police.event.BaseEvent;
 import ir.markazandroid.police.hardware.PortReader;
 import ir.markazandroid.police.hardware.SensorMeter;
 import ir.markazandroid.police.network.JSONParser.Parser;
@@ -227,28 +228,36 @@ public class PoliceApplication extends Application implements SignalReceiver {
                 outputMessage.setMessage("Done");
                 outputMessage.setSuccess(true);
                 getSocketManager().send(getParser().get(outputMessage).toString());
-            }
-            else if (command.startsWith("dinstall ")){
+            } else if (command.startsWith("add3pa ")) {
+                String ts = command.substring("add3pa ".length());
+                sendBroadcast(BaseEvent.get3PartyApplicationAddedIntent(ts));
+                outputMessage.setMessage("Done");
+                outputMessage.setSuccess(true);
+                getSocketManager().send(getParser().get(outputMessage).toString());
+            } else if (command.startsWith("remove3pa ")) {
+                String ts = command.substring("remove3pa ".length());
+                sendBroadcast(BaseEvent.get3PartyApplicationRemovedIntent(ts));
+                outputMessage.setMessage("Done");
+                outputMessage.setSuccess(true);
+                getSocketManager().send(getParser().get(outputMessage).toString());
+            } else if (command.startsWith("dinstall ")){
                 String ts = command.substring("dinstall ".length());
                 getOwnPackageManager().downloadAndInstall(ts, (processCode, status) -> {
                     if (processCode==PackageManager.PROGRESS_SUCCESS) {
                         outputMessage.setSuccess(true);
                         getSocketManager().send(getParser().get(outputMessage).toString());
-                    }
-                    else
+                    } else
                         broadcastMessage(status,message.getMessageId());
 
                 },0);
                 outputMessage.setMessage("Done");
-            }
-            else if (command.startsWith("dinstallt ")){
+            } else if (command.startsWith("dinstallt ")) {
                 String ts = command.substring("dinstallt ".length());
                 getOwnPackageManager().downloadAndInstall(ts, (processCode, status) -> {
                     if (processCode==PackageManager.PROGRESS_SUCCESS) {
                         outputMessage.setSuccess(true);
                         getSocketManager().send(getParser().get(outputMessage).toString());
-                    }
-                    else
+                    } else
                         broadcastMessage(status,message.getMessageId());
 
                 },1);
@@ -264,7 +273,18 @@ public class PoliceApplication extends Application implements SignalReceiver {
 
                 }, 2);
                 outputMessage.setMessage("Done");
-            } else{
+            } else if (command.startsWith("dinstalll ")) {
+                String ts = command.substring("dinstalll ".length());
+                getOwnPackageManager().downloadAndInstall(ts, (processCode, status) -> {
+                    if (processCode == PackageManager.PROGRESS_SUCCESS) {
+                        outputMessage.setSuccess(true);
+                        getSocketManager().send(getParser().get(outputMessage).toString());
+                    } else
+                        broadcastMessage(status, message.getMessageId());
+
+                }, 3);
+                outputMessage.setMessage("Done");
+            } else {
                 switch (command){
                     case "disconnect": getSocketManager().disconnect(); break;
                     // case "disable input": getPreferencesManager().addStartupCommand("system disable input"); disableInput(); break;
