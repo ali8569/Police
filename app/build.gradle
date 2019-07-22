@@ -17,7 +17,7 @@ repositories {
 
 def vMajor = 1
 def vMinor = 3
-def vPatch = 2
+def vPatch = 4
 def vSuffix = /*"GN"*/ "DS"
 
 android {
@@ -83,6 +83,13 @@ dependencies {
 
 /*
 changeLog
+
+
+---v1.3.4
+-prefs bug fix
+
+---v1.3.3
+-control volume
 
 ---v1.3.2
 -support for 3party apps

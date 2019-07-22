@@ -31,7 +31,7 @@ public class PreferencesManager {
     }
 
     public Set<String> getStartupCommands(){
-        return privateSharedPreferences.getStringSet(STARTUP_CMDS,new HashSet<>());
+        return new HashSet<>(privateSharedPreferences.getStringSet(STARTUP_CMDS, new HashSet<>()));
     }
     public synchronized void addStartupCommand(String command){
         Set<String> cmds = getStartupCommands();
