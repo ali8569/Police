@@ -12,6 +12,11 @@ public final class BaseEvent {
     public static final String EVENT_TYPE_DEVICE_AUTHENTICATED="EVENT_TYPE_DEVICE_AUTHENTICATED";
     public static final String EVENT_TYPE_MIRROR_BLOCK = "EVENT_TYPE_MIRROR_BLOCK";
     public static final String EVENT_TYPE_MIRROR_UNBLOCK = "EVENT_TYPE_MIRROR_UNBLOCK";
+    public static final String EVENT_TYPE_3PARTY_APPLICATION_ADDED = "EVENT_TYPE_3PARTY_APPLICATION_ADDED";
+    public static final String EVENT_TYPE_3PARTY_APPLICATION_REMOVED = "EVENT_TYPE_3PARTY_APPLICATION_REMOVED";
+
+    public static final String PARAMETER_APP_ID = "PARAMETER_APP_ID";
+
 
     public static Intent getDeviceAuthenticatedIntent(){
         Intent intent = new Intent(ACTION_EVENT);
@@ -28,6 +33,20 @@ public final class BaseEvent {
     public static Intent getMirrorUnBlockIntent() {
         Intent intent = new Intent(ACTION_EVENT);
         intent.putExtra(EVENT_TYPE_NAME, EVENT_TYPE_MIRROR_UNBLOCK);
+        return intent;
+    }
+
+    public static Intent get3PartyApplicationAddedIntent(String appId) {
+        Intent intent = new Intent(ACTION_EVENT);
+        intent.putExtra(EVENT_TYPE_NAME, EVENT_TYPE_3PARTY_APPLICATION_ADDED);
+        intent.putExtra(PARAMETER_APP_ID, appId);
+        return intent;
+    }
+
+    public static Intent get3PartyApplicationRemovedIntent(String appId) {
+        Intent intent = new Intent(ACTION_EVENT);
+        intent.putExtra(EVENT_TYPE_NAME, EVENT_TYPE_3PARTY_APPLICATION_REMOVED);
+        intent.putExtra(PARAMETER_APP_ID, appId);
         return intent;
     }
 }

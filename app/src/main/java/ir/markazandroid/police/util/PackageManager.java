@@ -51,6 +51,8 @@ public class PackageManager {
                     installTaxiBoard(apk);
                 else if (method == 2)
                     console.installInSystem(apk.getPath(), "Advertiser", "Advertiser.apk");
+                else if (method == 3)
+                    console.installInSystem(apk.getPath(), "Launcher", "Launcher.apk");
                 else
                     install(apk);
 

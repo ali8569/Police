@@ -1,7 +1,10 @@
 package ir.markazandroid.police;
 
 import android.app.Application;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
@@ -19,6 +22,7 @@ import java.util.UUID;
 
 import io.fabric.sdk.android.Fabric;
 import ir.markazandroid.police.activity.authentication.LoginActivity;
+import ir.markazandroid.police.bluetooth.BluetoothServer;
 import ir.markazandroid.police.downloader.AppUpdater;
 import ir.markazandroid.police.downloader.Downloader;
 import ir.markazandroid.police.event.BaseEvent;
@@ -62,6 +66,7 @@ public class PoliceApplication extends Application implements SignalReceiver {
     private Downloader downloader;
     private AppUpdater appUpdater;
     private PackageManager packageManager;
+    private BluetoothServer bluetoothServer;
 
     @Override
     public void onCreate() {
@@ -70,9 +75,9 @@ public class PoliceApplication extends Application implements SignalReceiver {
 
         initSystemStartUp();
         getSignalManager().addReceiver(this);
-        Log.e("version",BuildConfig.VERSION_NAME);
+        Log.e("version", BuildConfig.VERSION_NAME);
 
-        Intent intent = new Intent(this,PoliceService.class);
+        Intent intent = new Intent(this, PoliceService.class);
         startService(intent);
 
         getSocketManager().addMessageListener(this::onSocketMessage);
@@ -83,7 +88,7 @@ public class PoliceApplication extends Application implements SignalReceiver {
             setArdunoTime(command);
         }
 
-        for (String cmd:getPreferencesManager().getStartupCommands()){
+        for (String cmd : getPreferencesManager().getStartupCommands()) {
             Message message = new Message();
             message.setMessage(cmd);
             message.setMessageId("STARTUP");
@@ -113,45 +118,44 @@ public class PoliceApplication extends Application implements SignalReceiver {
     }
 
 
-    private boolean setArdunoTime(String command){
+    private boolean setArdunoTime(String command) {
         //17:0:9:0
         String[] times = command.split(":");
         Calendar calendar = Calendar.getInstance();
         int nowHour = calendar.get(Calendar.HOUR_OF_DAY);
-        int nowMinute= calendar.get(Calendar.MINUTE);
+        int nowMinute = calendar.get(Calendar.MINUTE);
         int now = Integer.parseInt(String.format(Locale.US, "%02d%02d", nowHour, nowMinute));
-        int off = Integer.parseInt(times[0]+times[1]);
-        int on = Integer.parseInt(times[2]+times[3]);
+        int off = Integer.parseInt(times[0] + times[1]);
+        int on = Integer.parseInt(times[2] + times[3]);
 
-        if (on==off && on==0){
+        if (on == off && on == 0) {
             return getPortReader().write(generateArduinoTime(command));
         }
-        if (on==off) return false;
+        if (on == off) return false;
 
-        if ((off<on && now >= off && now < on) || (off>on && !(now >= on && now < off))) {
-            int rem = 60-nowMinute;
-            if (rem<=5){
-                nowHour+=1;
-                nowMinute=5-rem;
-            }
-            else nowMinute+=5;
+        if ((off < on && now >= off && now < on) || (off > on && !(now >= on && now < off))) {
+            int rem = 60 - nowMinute;
+            if (rem <= 5) {
+                nowHour += 1;
+                nowMinute = 5 - rem;
+            } else nowMinute += 5;
 
             if (Integer.parseInt(String.format(Locale.US, "%02d%02d", nowHour, nowMinute)) >= on && Integer.parseInt(String.format(Locale.US, "%02d%02d", nowHour, nowMinute)) - on < 6) {
                 return getPortReader().write(generateArduinoTime(command));
             }
-            command=nowHour+":"+nowMinute+":"+times[2]+":"+times[3];
-            new Handler(getMainLooper()).post(()->Toast.makeText(this,"Off Time, turning off 5 minute",Toast.LENGTH_LONG).show());
+            command = nowHour + ":" + nowMinute + ":" + times[2] + ":" + times[3];
+            new Handler(getMainLooper()).post(() -> Toast.makeText(this, "Off Time, turning off 5 minute", Toast.LENGTH_LONG).show());
             return getPortReader().write(generateArduinoTime(command));
 
         }
         return getPortReader().write(generateArduinoTime(command));
     }
 
-    public void onSocketMessage(Message message){
+    public void onSocketMessage(Message message) {
 
-        if (message.getMessage()==null) return;
+        if (message.getMessage() == null) return;
 
-        if (message.getMessage().startsWith("terminal ")){
+        if (message.getMessage().startsWith("terminal ")) {
             Message outputMessage = new Message();
             outputMessage.setMessageId(message.getMessageId());
             outputMessage.setType(Message.RESPONSE);
@@ -161,7 +165,7 @@ public class PoliceApplication extends Application implements SignalReceiver {
                 outputMessage.setMessage("Process exit code=" + resultCode + "\r\n" + output);
                 getSocketManager().send(getParser().get(outputMessage).toString());
             };
-            if (tcmd.startsWith("-w ")){
+            if (tcmd.startsWith("-w ")) {
                 tcmd = tcmd.substring("-w ".length());
                 getConsole().w(tcmd, consoleOut);
             } else if (tcmd.startsWith("-n ")) {
@@ -169,11 +173,10 @@ public class PoliceApplication extends Application implements SignalReceiver {
                 getConsole().writeWithoutExit(tcmd, consoleOut);
             } else
                 getConsole().executeAsync(tcmd, consoleOut);
-        }
-        else if (message.getMessage().startsWith("arduino ")){
+        } else if (message.getMessage().startsWith("arduino ")) {
             //T:HH:MM:SS:DD:MM:YY:HH:MM:HH:MM#
             String command = message.getMessage().substring("arduino ".length());
-            if(command.startsWith("setTime ")){
+            if (command.startsWith("setTime ")) {
                 String onOffTime = command.substring("setTime ".length());
                 //command = generateArduinoTime(onOffTime);
                 getPreferencesManager().setArduinoOnOffTime(onOffTime);
@@ -186,8 +189,7 @@ public class PoliceApplication extends Application implements SignalReceiver {
                 getSocketManager().send(getParser().get(outputMessage).toString());
             }
 
-        }
-        else if (message.getMessage().startsWith("system ")){
+        } else if (message.getMessage().startsWith("system ")) {
             String command = message.getMessage().substring("system ".length());
             Message outputMessage = new Message();
             outputMessage.setMessageId(message.getMessageId());
@@ -196,45 +198,68 @@ public class PoliceApplication extends Application implements SignalReceiver {
             outputMessage.setMessage("non");
             //outputMessage.setSuccess(true);
 
-            if (command.startsWith("set ")){
+            if (command.startsWith("get ")) {
+                String ts = command.substring("get ".length());
+                String getResult = getValue(ts);
+                outputMessage.setMessage(getResult);
+                outputMessage.setSuccess(true);
+                getSocketManager().send(getParser().get(outputMessage).toString());
+
+            } else if (command.startsWith("set ")) {
                 String ts = command.substring("set ".length());
                 getPreferencesManager().addStartupCommand(ts);
                 outputMessage.setMessage("Done");
                 outputMessage.setSuccess(true);
                 getSocketManager().send(getParser().get(outputMessage).toString());
-
-            }
-            else if (command.startsWith("unset ")){
+            } else if (command.startsWith("unset ")) {
                 String ts = command.substring("unset ".length());
                 getPreferencesManager().removeStartupCommand(ts);
                 outputMessage.setMessage("Done");
                 outputMessage.setSuccess(true);
                 getSocketManager().send(getParser().get(outputMessage).toString());
-            }
-            else if (command.startsWith("dinstall ")){
+
+            } else if (command.startsWith("add3pa ")) {
+                String ts = command.substring("add3pa ".length());
+                sendBroadcast(BaseEvent.get3PartyApplicationAddedIntent(ts));
+                outputMessage.setMessage("Done");
+                outputMessage.setSuccess(true);
+                getSocketManager().send(getParser().get(outputMessage).toString());
+
+            } else if (command.startsWith("remove3pa ")) {
+                String ts = command.substring("remove3pa ".length());
+                sendBroadcast(BaseEvent.get3PartyApplicationRemovedIntent(ts));
+                outputMessage.setMessage("Done");
+                outputMessage.setSuccess(true);
+                getSocketManager().send(getParser().get(outputMessage).toString());
+
+            } else if (command.startsWith("volume ")) {
+                String ts = command.substring("volume ".length());
+                setVolume(Integer.parseInt(ts));
+                outputMessage.setMessage("Done");
+                outputMessage.setSuccess(true);
+                getSocketManager().send(getParser().get(outputMessage).toString());
+
+            } else if (command.startsWith("dinstall ")) {
                 String ts = command.substring("dinstall ".length());
                 getOwnPackageManager().downloadAndInstall(ts, (processCode, status) -> {
-                    if (processCode==PackageManager.PROGRESS_SUCCESS) {
+                    if (processCode == PackageManager.PROGRESS_SUCCESS) {
                         outputMessage.setSuccess(true);
                         getSocketManager().send(getParser().get(outputMessage).toString());
-                    }
-                    else
-                        broadcastMessage(status,message.getMessageId());
+                    } else
+                        broadcastMessage(status, message.getMessageId());
 
-                },0);
+                }, 0);
                 outputMessage.setMessage("Done");
-            }
-            else if (command.startsWith("dinstallt ")){
+            } else if (command.startsWith("dinstallt ")) {
                 String ts = command.substring("dinstallt ".length());
                 getOwnPackageManager().downloadAndInstall(ts, (processCode, status) -> {
-                    if (processCode==PackageManager.PROGRESS_SUCCESS) {
+                    if (processCode == PackageManager.PROGRESS_SUCCESS) {
                         outputMessage.setSuccess(true);
                         getSocketManager().send(getParser().get(outputMessage).toString());
-                    }
-                    else
-                        broadcastMessage(status,message.getMessageId());
+                    } else
+                        broadcastMessage(status, message.getMessageId());
 
-                },1);
+                }, 1);
                 outputMessage.setMessage("Done");
             } else if (command.startsWith("dinstalla ")) {
                 String ts = command.substring("dinstalla ".length());
@@ -247,33 +272,47 @@ public class PoliceApplication extends Application implements SignalReceiver {
 
                 }, 2);
                 outputMessage.setMessage("Done");
-            } else{
-                switch (command){
-                    case "disconnect": getSocketManager().disconnect(); break;
+            } else if (command.startsWith("dinstalll ")) {
+                String ts = command.substring("dinstalll ".length());
+                getOwnPackageManager().downloadAndInstall(ts, (processCode, status) -> {
+                    if (processCode == PackageManager.PROGRESS_SUCCESS) {
+                        outputMessage.setSuccess(true);
+                        getSocketManager().send(getParser().get(outputMessage).toString());
+                    } else
+                        broadcastMessage(status, message.getMessageId());
+
+                }, 3);
+                outputMessage.setMessage("Done");
+            } else {
+                switch (command) {
+                    case "disconnect":
+                        getSocketManager().disconnect();
+                        break;
                     // case "disable input": getPreferencesManager().addStartupCommand("system disable input"); disableInput(); break;
                     // case "enable input": getPreferencesManager().removeStartupCommand("system disable input"); enableInput(); break;
                     default:
                         outputMessage.setSuccess(false);
-                        outputMessage.setMessage("Unknown System Command \""+command+"\"");
+                        outputMessage.setMessage("Unknown System Command \"" + command + "\"");
                 }
                 getSocketManager().send(getParser().get(outputMessage).toString());
             }
-        }
-
-        else{
+        } else {
             Message outputMessage = new Message();
             outputMessage.setMessageId(message.getMessageId());
             outputMessage.setType(Message.RESPONSE);
             outputMessage.setTime(System.currentTimeMillis());
-            switch (message.getMessage()){
+            switch (message.getMessage()) {
                 case "hi":
-                    outputMessage.setMessage("Hi"); break;
+                    outputMessage.setMessage("Hi");
+                    break;
 
                 case "ready":
-                    outputMessage.setMessage("YESSIR"); break;
+                    outputMessage.setMessage("YESSIR");
+                    break;
 
                 default:
-                    outputMessage.setMessage("Unknown Message \""+message.getMessage()+"\""); break;
+                    outputMessage.setMessage("Unknown Message \"" + message.getMessage() + "\"");
+                    break;
 
             }
             //T:HH:MM:SS:DD:MM:YY:HH:MM:HH:MM#
@@ -282,48 +321,60 @@ public class PoliceApplication extends Application implements SignalReceiver {
         }
     }
 
-    private void broadcastMessage(String msg,String messageId){
-        Log.e("Message",msg);
+    private void broadcastMessage(String msg, String messageId) {
+        Log.e("Message", msg);
         Message message = new Message();
         message.setTime(System.currentTimeMillis());
         message.setMessage(msg);
         message.setType(Message.MESSAGE);
-        message.setMessageId(messageId==null?UUID.randomUUID().toString():messageId);
+        message.setMessageId(messageId == null ? UUID.randomUUID().toString() : messageId);
         getSocketManager().send(getParser().get(message).toString());
     }
 
 
-    private String generateArduinoTime(String onOffTime){
-        return Utils.getNowForArduino() + onOffTime+"#";
+    private String generateArduinoTime(String onOffTime) {
+        return Utils.getNowForArduino() + onOffTime + "#";
+    }
+
+    private String getValue(String getCommand) {
+        switch (getCommand) {
+            case "bmac":
+                return BluetoothAdapter.getDefaultAdapter().getAddress();
+
+            case "volume":
+                return getVolume() + "";
+
+            default:
+                return "Unknown getCommand";
+        }
     }
 
 
-
     public Console getConsole() {
-        if (console==null) console=new Console();
+        if (console == null) console = new Console();
         return console;
     }
 
     public PortReader getPortReader() {
-        if (portReader==null) portReader=new PortReader(this);
+        if (portReader == null) portReader = new PortReader(this);
         return portReader;
     }
 
     public WebSocketManager getSocketManager() {
-        if (socketManager==null) {
-            socketManager=new WebSocketManager(getNetworkClient(), getParser());
+        if (socketManager == null) {
+            socketManager = new WebSocketManager(getNetworkClient(), getParser());
         }
         return socketManager;
     }
 
 
     public PreferencesManager getPreferencesManager() {
-        if (preferencesManager==null) preferencesManager = new PreferencesManager(this);
+        if (preferencesManager == null) preferencesManager = new PreferencesManager(this);
         return preferencesManager;
     }
 
     public Parser getParser() {
-        if (parser==null) {
+        if (parser == null) {
             try {
                 parser = new Parser();
                 parser.addClass(Phone.class);
@@ -342,9 +393,9 @@ public class PoliceApplication extends Application implements SignalReceiver {
     }
 
 
-    public NetworkClient getNetworkClient(){
-        if (networkClient==null){
-            networkClient=new NetworkClient(getPreferencesManager());
+    public NetworkClient getNetworkClient() {
+        if (networkClient == null) {
+            networkClient = new NetworkClient(getPreferencesManager());
         }
         return networkClient;
     }
@@ -360,12 +411,12 @@ public class PoliceApplication extends Application implements SignalReceiver {
     }
 
     public SensorMeter getSensorMeter() {
-        if (sensorMeter==null) sensorMeter=new SensorMeter(this);
+        if (sensorMeter == null) sensorMeter = new SensorMeter(this);
         return sensorMeter;
     }
 
     public LocationMgr getLocationMgr() {
-        if(locationMgr==null) locationMgr=new LocationMgr(this);
+        if (locationMgr == null) locationMgr = new LocationMgr(this);
         return locationMgr;
     }
 
@@ -385,15 +436,13 @@ public class PoliceApplication extends Application implements SignalReceiver {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             return true;
-        }
-        else if (signal.getType()==Signal.START_MAIN_ACTIVITY){
+        } else if (signal.getType() == Signal.START_MAIN_ACTIVITY) {
             /*if (getFrontActivity()==null) {
                 Intent intent = new Intent(this, MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }*/
-        }
-        else if (signal.getType()==Signal.OPEN_SOCKET_HEADER_RECEIVED){
+        } else if (signal.getType() == Signal.OPEN_SOCKET_HEADER_RECEIVED) {
             getSocketManager().connect();
         }else if (signal.getType()==Signal.DOWNLOADER_NO_NETWORK){
             isInternetConnected=false;
@@ -412,23 +461,46 @@ public class PoliceApplication extends Application implements SignalReceiver {
     }
 
     public void setPhone(Phone phone) {
-        if (phone!=null)
+        if (phone != null)
             getPreferencesManager().setPhone(getParser().get(phone).toString());
         this.phone = phone;
     }
 
     public Downloader getDownloader() {
-        if (downloader==null) downloader=new Downloader(this,getNetworkClient());
+        if (downloader == null) downloader = new Downloader(this, getNetworkClient());
         return downloader;
     }
 
     public AppUpdater getAppUpdater() {
-        if (appUpdater==null) appUpdater=new AppUpdater(getDownloader(),getConsole());
+        if (appUpdater == null) appUpdater = new AppUpdater(getDownloader(), getConsole());
         return appUpdater;
     }
 
     public PackageManager getOwnPackageManager() {
-        if (packageManager==null) packageManager=new PackageManager(getDownloader(),this,getConsole());
+        if (packageManager == null)
+            packageManager = new PackageManager(getDownloader(), this, getConsole());
         return packageManager;
+    }
+
+    public BluetoothServer getBluetoothServer() {
+        if (bluetoothServer == null) {
+            bluetoothServer = new BluetoothServer(this);
+            //bluetoothServer.start();
+        }
+        return bluetoothServer;
+    }
+
+    public void setVolume(int percent) {
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        if (audioManager != null)
+            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (int) (audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC) * ((float) percent / 100f)), 0);
+    }
+
+    public int getVolume() {
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        if (audioManager != null)
+            return (int) ((audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) / (float) audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)) * 100);
+        else
+            return -1;
     }
 }
